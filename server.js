@@ -18,12 +18,10 @@ const app = express();
 // ============================================================
 const mongoUri = process.env.MONGODB_URI;
 
-mongoose.connect(mongoUri, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-.then(() => console.log("🍃 MongoDB conectado com sucesso!"))
-.catch((err) => console.error("❌ Erro ao conectar no MongoDB:", err));
+mongoose.connect(mongoUri)
+  .then(() => console.log("🍃 MongoDB conectado com sucesso!"))
+  .catch((err) => console.error("❌ Erro ao conectar no MongoDB:", err));
+
 
 // ============================================================
 // 🔓 CORS — Permitir acesso do GitHub Pages e localhost
