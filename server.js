@@ -18,9 +18,10 @@ const app = express();
 // ============================================================
 const mongoUri = process.env.MONGODB_URI;
 
-mongoose.connect(mongoUri)
-  .then(() => console.log("🍃 MongoDB conectado com sucesso!"))
-  .catch((err) => console.error("❌ Erro ao conectar no MongoDB:", err));
+import mongoose from "mongoose";
+mongoose.connect("mongodb+srv://cadastropcd:j2A8Ec2cLYxwi9tG@pcd.73ykjk4.mongodb.net/?retryWrites=true&w=majority&appName=Pcd")
+  .then(() => console.log("✅ Conectou com sucesso!"))
+  .catch(err => console.error("❌ Erro Mongo:", err));
 
 
 // ============================================================
