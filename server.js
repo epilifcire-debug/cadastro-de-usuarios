@@ -1,5 +1,5 @@
 // ============================================================
-// 🌐 SERVIDOR PCD EVENTOS + BACKUP CLOUDINARY (PROTEGIDO)
+// 🌐 SERVIDOR PCD EVENTOS + BACKUP CLOUDINARY (Render + GitHub Pages)
 // ============================================================
 import express from "express";
 import cors from "cors";
@@ -8,44 +8,37 @@ import { v2 as cloudinary } from "cloudinary";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 import dotenv from "dotenv";
 import streamifier from "streamifier";
-import mongoose from "mongoose";
 
 dotenv.config();
 const app = express();
 
 // ============================================================
-// 🍃 CONEXÃO COM MONGODB ATLAS
+// 🔧 CORS UNIVERSAL (compatível com Render + GitHub Pages + localhost)
 // ============================================================
-const mongoUri = process.env.MONGODB_URI;
+app.use(cors({
+  origin: [
+    "http://localhost:3000",
+    "https://epilifcire-debug.github.io",
+    "https://epilifcire-debug.github.io/pcd-eventos"
+  ],
+  methods: ["GET", "POST", "OPTIONS"],
+  allowedHeaders: ["Content-Type"],
+  credentials: true
+}));
 
-mongoose
-  .connect(mongoUri)
-  .then(() => console.log("🍃 MongoDB conectado com sucesso!"))
-  .catch((err) => console.error("❌ Erro ao conectar no MongoDB:", err));
-
-// ============================================================
-// 🔓 CORS — Permitir acesso do GitHub Pages e localhost
-// ============================================================
-const allowedOrigins = [
-  "http://localhost:3000",
-  "https://epilifcire-debug.github.io",
-  "https://epilifcire-debug.github.io/pcd-eventos",
-];
-
+// 🔒 Middleware CORS adicional — cobre erros 404 e respostas sem CORS
 app.use((req, res, next) => {
-  const origin = req.headers.origin;
-  if (allowedOrigins.includes(origin)) {
-    res.header("Access-Control-Allow-Origin", origin);
-  }
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type");
+  next();
+});
 
-  res.header("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
-  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  res.header("Access-Control-Allow-Credentials", "true");
-
-  if (req.method === "OPTIONS") {
-    return res.sendStatus(200);
-  }
-
+// 🚫 Evita cache em todas as respostas
+app.use((req, res, next) => {
+  res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+  res.setHeader("Pragma", "no-cache");
+  res.setHeader("Expires", "0");
   next();
 });
 
@@ -56,7 +49,7 @@ app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 // ☁️ CONFIGURAÇÃO DO CLOUDINARY
 // ============================================================
 cloudinary.config({
-  cloud_name: process.env.CLOUD_NAME,
+  cloud_name: process.env.CLOUD_NAME || "djln3mjwd",
   api_key: process.env.CLOUD_KEY,
   api_secret: process.env.CLOUD_SECRET,
 });
@@ -66,11 +59,14 @@ cloudinary.config({
 // ============================================================
 const storage = new CloudinaryStorage({
   cloudinary,
-  params: async (req, file) => ({
-    folder: "uploads_pcd_eventos/arquivos",
-    resource_type: "auto",
-    public_id: file.originalname.split(".")[0],
-  }),
+  params: async (req, file) => {
+    const nomePessoa = req.body.nomePessoa || "sem-nome";
+    return {
+      folder: `uploads_pcd_eventos/${nomePessoa}`,
+      resource_type: "auto",
+      public_id: file.originalname.split(".")[0],
+    };
+  },
 });
 const upload = multer({ storage });
 
@@ -82,7 +78,6 @@ app.post("/upload", upload.any(), async (req, res) => {
     if (!req.files || req.files.length === 0) {
       return res.status(400).json({ error: "Nenhum arquivo recebido." });
     }
-
     const arquivos = {};
     req.files.forEach((file) => {
       arquivos[file.fieldname] = {
@@ -92,7 +87,6 @@ app.post("/upload", upload.any(), async (req, res) => {
         tamanho: file.size,
       };
     });
-
     res.json({ message: "Upload concluído com sucesso!", arquivos });
   } catch (err) {
     console.error("❌ Erro no upload:", err);
@@ -101,20 +95,11 @@ app.post("/upload", upload.any(), async (req, res) => {
 });
 
 // ============================================================
-// 💾 BACKUP JSON — SOBRESCREVE ARQUIVO ÚNICO (DADOS SANITIZADOS)
+// 💾 BACKUP JSON — sempre sobrescreve backup_ultimo.json
 // ============================================================
 app.post("/backup-json", async (req, res) => {
   try {
-    const sanitized = { ...req.body };
-
-    // 🔒 Sanitização dos dados sensíveis
-    if (sanitized.cpf) delete sanitized.cpf;
-    if (sanitized.senha) delete sanitized.senha;
-    if (sanitized.telefone) {
-      sanitized.telefone = sanitized.telefone.replace(/\d(?=\d{2})/g, "*");
-    }
-
-    const jsonData = JSON.stringify(sanitized, null, 2);
+    const jsonData = JSON.stringify(req.body, null, 2);
     const nomeArquivo = "backup_ultimo.json";
 
     const uploadStream = cloudinary.uploader.upload_stream(
@@ -123,18 +108,16 @@ app.post("/backup-json", async (req, res) => {
         resource_type: "raw",
         public_id: nomeArquivo.replace(".json", ""),
         overwrite: true,
-        type: "authenticated", // 🔒 Backup não público
       },
       (error, result) => {
         if (error) {
           console.error("❌ Erro ao enviar backup:", error);
           return res.status(500).json({ error: "Falha ao enviar backup." });
         }
-
         console.log("☁️ Backup atualizado:", result.secure_url);
         res.json({
           message: "Backup enviado com sucesso!",
-          url: `${result.secure_url}?v=${Date.now()}`,
+          url: `${result.secure_url}?v=${Date.now()}`, // evita cache
         });
       }
     );
@@ -160,18 +143,19 @@ app.get("/listar-backups", async (req, res) => {
     });
 
     if (!result.resources || result.resources.length === 0) {
+      console.warn("⚠️ Nenhum backup encontrado no Cloudinary.");
       return res.status(404).json({ error: "Nenhum backup encontrado." });
     }
 
     const ultimo = result.resources[0];
     console.log("🔍 Backup atual:", ultimo.secure_url);
 
-    let backupJson = null;
+    let backupJson = {};
     try {
-      const backupRes = await fetch(ultimo.secure_url);
+      const backupRes = await fetch(`${ultimo.secure_url}?v=${Date.now()}`);
       backupJson = await backupRes.json();
     } catch (e) {
-      console.warn("⚠️ Não foi possível baixar o conteúdo do backup:", e.message);
+      console.warn("⚠️ Não foi possível ler o backup diretamente:", e.message);
     }
 
     res.json({
@@ -188,10 +172,10 @@ app.get("/listar-backups", async (req, res) => {
 });
 
 // ============================================================
-// 🔄 TESTE DO SERVIDOR (HEALTH CHECK)
+// 🔄 TESTE DO SERVIDOR
 // ============================================================
 app.get("/", (req, res) => {
-  res.send("✅ Servidor PCD Eventos ativo e conectado ao Cloudinary (modo protegido).");
+  res.send("✅ Servidor PCD Eventos rodando e conectado ao Cloudinary (Render).");
 });
 
 // ============================================================
