@@ -1,7 +1,7 @@
 {
-  "name": "pcd-eventos-backend",
-  "version": "1.0.1",
-  "description": "Servidor Node.js com MongoDB Atlas + Cloudinary (modo protegido) para o sistema PCD Eventos — upload, backup e gerenciamento de funcionários.",
+  "name": "pcd-eventos-server",
+  "version": "1.0.0",
+  "description": "Servidor backend do Sistema PCD Eventos com integração ao Cloudinary (backup e upload de documentos).",
   "main": "server.js",
   "type": "module",
   "scripts": {
@@ -9,13 +9,12 @@
     "dev": "nodemon server.js"
   },
   "dependencies": {
-    "cloudinary": "1.41.3",
+    "cloudinary": "^1.41.3",
     "cors": "^2.8.5",
-    "dotenv": "^16.6.1",
-    "express": "^4.22.1",
-    "mongoose": "^8.6.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
     "multer": "^1.4.5-lts.1",
-    "multer-storage-cloudinary": "4.0.0",
+    "multer-storage-cloudinary": "^4.0.0",
     "streamifier": "^0.1.1"
   },
   "devDependencies": {
@@ -25,16 +24,12 @@
     "node": ">=18.0.0"
   },
   "keywords": [
-    "nodejs",
-    "express",
-    "cloudinary",
-    "multer",
-    "mongoose",
-    "mongodb",
-    "backup",
-    "upload",
     "pcd-eventos",
-    "render"
+    "backup",
+    "cloudinary",
+    "express",
+    "render",
+    "multer"
   ],
   "author": "Eric Filipe",
   "license": "MIT"
