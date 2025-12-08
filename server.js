@@ -18,11 +18,9 @@ const app = express();
 // ============================================================
 const mongoUri = process.env.MONGODB_URI;
 
-import mongoose from "mongoose";
-mongoose.connect("mongodb+srv://cadastropcd:j2A8Ec2cLYxwi9tG@pcd.73ykjk4.mongodb.net/?retryWrites=true&w=majority&appName=Pcd")
-  .then(() => console.log("✅ Conectou com sucesso!"))
-  .catch(err => console.error("❌ Erro Mongo:", err));
-
+mongoose.connect(mongoUri)
+  .then(() => console.log("🍃 MongoDB conectado com sucesso!"))
+  .catch((err) => console.error("❌ Erro ao conectar no MongoDB:", err));
 
 // ============================================================
 // 🔓 CORS — Permitir acesso do GitHub Pages e localhost
@@ -63,14 +61,11 @@ cloudinary.config({
 // ============================================================
 const storage = new CloudinaryStorage({
   cloudinary,
-  params: async (req, file) => {
-    // evita incluir nome da pessoa no caminho do Cloudinary
-    return {
-      folder: `uploads_pcd_eventos/arquivos`,
-      resource_type: "auto",
-      public_id: file.originalname.split(".")[0],
-    };
-  },
+  params: async (req, file) => ({
+    folder: "uploads_pcd_eventos/arquivos",
+    resource_type: "auto",
+    public_id: file.originalname.split(".")[0],
+  }),
 });
 const upload = multer({ storage });
 
@@ -116,7 +111,7 @@ app.post("/backup-json", async (req, res) => {
       sanitized.telefone = sanitized.telefone.replace(/\d(?=\d{2})/g, "*");
     }
 
-    // Opcional: remover outros campos sensíveis
+    // Remover senha
     if (sanitized.senha) delete sanitized.senha;
 
     const jsonData = JSON.stringify(sanitized, null, 2);
@@ -139,12 +134,11 @@ app.post("/backup-json", async (req, res) => {
         console.log("☁️ Backup atualizado:", result.secure_url);
         res.json({
           message: "Backup enviado com sucesso!",
-          url: `${result.secure_url}?v=${Date.now()}`
+          url: `${result.secure_url}?v=${Date.now()}`,
         });
       }
     );
 
-    // Cria stream e envia
     streamifier.createReadStream(Buffer.from(jsonData)).pipe(uploadStream);
   } catch (err) {
     console.error("❌ Erro ao processar backup:", err);
@@ -153,7 +147,7 @@ app.post("/backup-json", async (req, res) => {
 });
 
 // ============================================================
-// 📋 LISTAR BACKUP MAIS RECENTE (CORRIGIDO)
+// 📋 LISTAR BACKUP MAIS RECENTE
 // ============================================================
 app.get("/listar-backups", async (req, res) => {
   try {
@@ -177,7 +171,7 @@ app.get("/listar-backups", async (req, res) => {
       const backupRes = await fetch(ultimo.secure_url);
       backupJson = await backupRes.json();
     } catch (e) {
-      console.warn("⚠️ Não foi possível baixar o conteúdo do backup diretamente:", e.message);
+      console.warn("⚠️ Não foi possível baixar o conteúdo do backup:", e.message);
     }
 
     res.json({
