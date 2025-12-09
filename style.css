@@ -1,0 +1,210 @@
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #0a0f1a;
+  color: #e3f2fd;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+/* HEADER */
+header {
+  text-align: center;
+  padding: 20px;
+  background-color: #1e293b;
+  border-bottom: 2px solid #42a5f5;
+  animation: fadeDown 0.8s ease-out;
+}
+
+.logo {
+  width: 160px;
+  max-width: 60%;
+  display: block;
+  margin: 0 auto 10px auto;
+  opacity: 0;
+  transform: translateY(-10px);
+  animation: fadeDown 1.2s ease-out forwards;
+}
+
+h1, h2 {
+  color: #42a5f5;
+  margin-bottom: 10px;
+}
+
+main {
+  max-width: 900px;
+  margin: 20px auto;
+  padding: 10px;
+}
+
+.card {
+  background-color: #1e293b;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+  opacity: 0;
+  transform: translateY(10px);
+  animation: fadeIn 0.6s ease forwards;
+}
+
+label {
+  display: block;
+  margin-top: 10px;
+  color: #90caf9;
+}
+
+input, textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #42a5f5;
+  border-radius: 8px;
+  background-color: #0a0f1a;
+  color: #e3f2fd;
+  margin-top: 5px;
+}
+
+button {
+  margin-top: 15px;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 8px;
+  background-color: #42a5f5;
+  color: #0a0f1a;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+button:hover {
+  background-color: #1565c0;
+  color: white;
+  transform: scale(1.03);
+}
+
+.btn-resetar {
+  background-color: #d32f2f;
+  color: #fff;
+}
+
+.btn-resetar:hover {
+  background-color: #b71c1c;
+}
+
+footer {
+  text-align: center;
+  padding: 10px;
+  background-color: #1e293b;
+  color: #90caf9;
+  font-size: 0.9em;
+  opacity: 0;
+  animation: fadeUp 1s ease forwards;
+}
+
+/* UTILITÁRIOS */
+.hidden {
+  display: none;
+}
+
+.hint {
+  font-size: 0.85rem;
+  color: #90caf9;
+  margin-top: 10px;
+}
+
+/* ===== ANIMAÇÕES ===== */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(0.98); }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* CLASSES DE ANIMAÇÃO */
+.fade-in { animation: fadeIn 0.7s ease forwards; }
+.fade-out { animation: fadeOut 0.7s ease forwards; }
+
+/* USUÁRIOS */
+.usuario-card {
+  background-color: #0a0f1a;
+  border: 1px solid #42a5f5;
+  border-radius: 10px;
+  padding: 10px;
+  margin-top: 10px;
+  opacity: 0;
+  animation: fadeIn 0.6s ease forwards;
+}
+
+.senha-linha {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.senha-valor {
+  font-family: 'Consolas', 'Courier New', monospace;
+}
+
+.btn-icon {
+  margin-top: 0;
+  padding: 6px 10px;
+  font-size: 0.9rem;
+  border-radius: 6px;
+}
+
+/* MODAL */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(10, 15, 26, 0.9);
+  justify-content: center;
+  align-items: center;
+  animation: fadeIn 0.4s ease;
+}
+
+.modal-content {
+  background-color: #1e293b;
+  border: 2px solid #42a5f5;
+  border-radius: 12px;
+  padding: 20px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 0 15px rgba(66,165,245,0.4);
+  color: #e3f2fd;
+  animation: fadeIn 0.6s ease forwards;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+}
+
+.btn-cancelar {
+  background-color: #d32f2f;
+  color: #fff;
+}
+
+.btn-cancelar:hover {
+  background-color: #b71c1c;
+}

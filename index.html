@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>App de Cadastro</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0A0F1A">
+</head>
+<body>
+  <header>
+    <!-- Coloque o arquivo como img/logo.png -->
+    <img src="img/logo.png" alt="Logo" class="logo">
+    <h1>App de Cadastro</h1>
+  </header>
+
+  <main>
+    <!-- LOGIN ADMIN -->
+    <section id="loginSection" class="card">
+      <h2>Login do Administrador</h2>
+      <form id="formLoginAdmin">
+        <label for="adminLoginInput">Login</label>
+        <input type="text" id="adminLoginInput" required>
+
+        <label for="adminSenhaInput">Senha</label>
+        <input type="password" id="adminSenhaInput" required>
+
+        <button type="submit" class="btn-salvar">Acessar Painel</button>
+      </form>
+    </section>
+
+    <!-- APP (VISÍVEL APÓS LOGIN) -->
+    <section id="appSection" class="hidden">
+      <!-- FORMULÁRIO DE USUÁRIO -->
+      <section class="card">
+        <h2>Cadastrar Novo Usuário</h2>
+        <form id="formUsuario">
+          <label for="nomeUsuario">Nome do Usuário</label>
+          <input type="text" id="nomeUsuario" required>
+
+          <label for="eventoUsuario">Evento</label>
+          <input type="text" id="eventoUsuario" required>
+
+          <button type="submit" class="btn-salvar">Salvar Usuário</button>
+        </form>
+        <p class="hint">
+          O login será gerado automaticamente no formato:
+          <b>nomedousuario.evento</b> (minúsculo, sem espaços)
+        </p>
+      </section>
+
+      <!-- LISTAGEM -->
+      <section class="card">
+        <h2>Usuários Cadastrados</h2>
+        <div id="listaUsuarios"></div>
+      </section>
+
+      <!-- BACKUP -->
+      <section class="card">
+        <h2>Backup & Restauração</h2>
+        <button id="btnExportar">Exportar Backup</button>
+        <input type="file" id="importarBackup" accept=".json">
+        <button id="btnImportar">Importar Backup</button>
+        <button id="btnLimpar">Limpar Dados de Usuários</button>
+        <button id="btnResetar" class="btn-resetar">Resetar Sistema</button>
+      </section>
+
+      <!-- CONFIG ADMIN -->
+      <section class="card">
+        <h2>Configurações do Admin</h2>
+        <p>Login atual do administrador: <b id="adminLoginLabel">admin</b></p>
+        <form id="formAlterarSenhaAdmin">
+          <label for="novaSenhaAdmin">Nova senha do admin</label>
+          <input type="password" id="novaSenhaAdmin" required>
+          <button type="submit">Salvar nova senha</button>
+        </form>
+      </section>
+    </section>
+  </main>
+
+  <footer>
+    <p>Desenvolvido por Eric Filipe</p>
+  </footer>
+
+  <!-- MODAL DE EDIÇÃO DE USUÁRIO -->
+  <div id="modalEditar" class="modal">
+    <div class="modal-content">
+      <h2>Editar Usuário</h2>
+      <form id="formEditar">
+        <input type="hidden" id="editId">
+
+        <label for="editNome">Nome do Usuário</label>
+        <input type="text" id="editNome" required>
+
+        <label for="editEvento">Evento</label>
+        <input type="text" id="editEvento" required>
+
+        <div class="modal-buttons">
+          <button type="submit" class="btn-salvar">Salvar Alterações</button>
+          <button type="button" id="cancelarEdicao" class="btn-cancelar">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+
+  <script>
+    // Registro do Service Worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js')
+        .then(() => console.log("✅ Service Worker registrado com sucesso!"))
+        .catch(err => console.log("❌ Erro ao registrar Service Worker:", err));
+    }
+  </script>
+</body>
+</html>
